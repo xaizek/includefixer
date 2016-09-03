@@ -139,6 +139,10 @@ function! s:IsCxxStd(include)
     return 0
 endfunction
 
+function! s:IsSystem(include)
+    return a:include =~# '<[^>]\+>'
+endfunction
+
 function! s:SetupCustom(list)
     if exists('g:include_fixer_custom') == 0
         return
@@ -209,6 +213,7 @@ function! s:FixIncludes()
     let l:qt     = []
     let l:cstd   = []
     let l:cxxstd = []
+    let l:system = []
     let l:custom = []
     call <SID>SetupCustom(l:custom)
 
@@ -227,6 +232,8 @@ function! s:FixIncludes()
             call add(l:cstd,l:i)
         elseif <SID>IsCxxStd(l:i)
             call add(l:cxxstd,l:i)
+        elseif <SID>IsSystem(l:i)
+            call add(l:system,l:i)
         elseif <SID>IsCustom(l:custom,l:i)
         else
             call add(l:local,l:i)
@@ -235,6 +242,7 @@ function! s:FixIncludes()
 
     " write out all the groups
     let l:next = <SID>WriteOut(l:start,l:module)
+    let l:next = <SID>WriteOut(l:next,l:system)
     let l:next = <SID>WriteOut(l:next,l:local)
 
     let l:i = 0
