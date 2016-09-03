@@ -170,6 +170,33 @@ function! s:IsCustom(list, include)
     return 0
 endfunction
 
+function! s:IncludeCompare(i1, i2)
+    " extract paths
+    let l:i1 = substitute(a:i1, '.*["<]\([^">]\+\)[">].*', '\1', '')
+    let l:i2 = substitute(a:i2, '.*["<]\([^">]\+\)[">].*', '\1', '')
+
+    while 1
+        " check for presence of slashes in both paths
+        let l:s1 = (stridx(l:i1, '/') != -1)
+        let l:s2 = (stridx(l:i2, '/') != -1)
+        " path without slashes is greater than path with them
+        if l:s1 != l:s2
+            return l:s1 ? -1 : 1
+        endif
+
+        " extract next entries from both paths
+        let l:e1 = substitute(l:i1, '\([^/\\]\+\).*', '\1', '')
+        let l:e2 = substitute(l:i2, '\([^/\\]\+\).*', '\1', '')
+        let l:i1 = l:i1[len(l:e1) + 1:]
+        let l:i2 = l:i2[len(l:e2) + 1:]
+
+        " compare entries and exit if they differ
+        if l:e1 !=# l:e2
+            return l:e1 ># l:e2 ? 1 : -1
+        endif
+    endwhile
+endfunction
+
 function! s:WriteOut(start,list)
     " check the list is empty
     if len(a:list) == 0
@@ -179,7 +206,7 @@ function! s:WriteOut(start,list)
     let l:end = a:start + len(a:list)
 
     " sort the list
-    call sort(a:list)
+    call sort(a:list, "<SID>IncludeCompare")
 
     " write out the list and an empty line
     call append(a:start,a:list)
