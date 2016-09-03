@@ -89,14 +89,13 @@ function! s:RecordIncludes(includes, lines)
     call add(a:lines,line("."))
 endfunction
 
-function! s:ClearEmpty(start,end)
+function! s:ClearEmpty(start, end)
     " delete every empty line between the start and end ranges of includes
-    if (line(".") < a:start)
-        return
-    elseif(line(".") > a:end)
-        return
-    endif
-    execute 'delete _'
+    for l:n in range(a:end, a:start, -1)
+        if getline(l:n) =~ '^\s*$'
+            execute l:n.'delete _'
+        endif
+    endfor
 endfunction
 
 function! s:IsModule(include, filename)
@@ -202,7 +201,7 @@ function! s:FixIncludes()
 
     let l:start = l:lines[0] - 1
     let l:end = l:lines[len(l:lines)-1]
-    %g/^\s*$/call <SID>ClearEmpty(l:start, l:end)
+    call s:ClearEmpty(l:start, l:end)
     " now we can delete all the includes
     %g/#include/d
 
