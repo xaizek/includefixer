@@ -269,7 +269,10 @@ function! s:FixIncludes()
     " write out all the groups
     let l:next = <SID>WriteOut(l:start,l:module)
     let l:next = <SID>WriteOut(l:next,l:system)
-    let l:next = <SID>WriteOut(l:next,l:local)
+    let l:next = <SID>WriteOut(l:next,l:cstd)
+    let l:next = <SID>WriteOut(l:next,l:cxxstd)
+    let l:next = <SID>WriteOut(l:next,l:boost)
+    let l:next = <SID>WriteOut(l:next,l:qt)
 
     let l:i = 0
     while l:i < len(l:custom)
@@ -277,11 +280,7 @@ function! s:FixIncludes()
         let l:i = l:i + 1
     endwhile
 
-    let l:next = <SID>WriteOut(l:next,l:boost)
-    let l:next = <SID>WriteOut(l:next,l:qt)
-    let l:next = <SID>WriteOut(l:next,l:cstd)
-    let l:next = <SID>WriteOut(l:next,l:cxxstd)
-
+    let l:next = <SID>WriteOut(l:next,l:local)
 endfunction
 
 command! FixIncludes call <SID>FixIncludes()
